@@ -62,7 +62,7 @@ void Grid::DefineSearchingRange(int cellidx, std::vector<int> &neighborcells)
                      cellidx + Grid::cellnum_lat * 2 + 1, cellidx + Grid::cellnum_lat * 2, cellidx + Grid::cellnum_lat * 2 + 1};
 };
 
-double distance(const Point &a, const Point &b)
+double P2Pdistance(const Point &a, const Point &b)
 {
     return std::sqrt((a.x - b.x) * (a.y - b.y));
 }
@@ -72,7 +72,7 @@ std::vector<int> FindNeighbors(const std::vector<Point> &points, int pointIdx, d
     std::vector<int> neighbors;
     for (int i = 0; i < points.size(); i++)
     {
-        if (distance(points[pointIdx], points[i]) <= eps && i != pointIdx)
+        if (P2Pdistance(points[pointIdx], points[i]) <= eps && i != pointIdx)
         {
             neighbors.push_back(i);
         }
@@ -96,12 +96,12 @@ void ExpandCluster(std::vector<Point> &points, int pointIdx, int &clusterID, dou
         if (points[idx].clusterID == 0)
         {
             points[idx].clusterID = clusterID;
-            points[idx].nearestCorePointDistance = distance(points[idx],points[pointIdx]);
+            points[idx].nearestCorePointDistance = P2Pdistance(points[idx],points[pointIdx]);
         }
         else if (points[idx].clusterID == -1 || points[idx].isBorderPointFlg)
         {
             points[idx].isBorderPointFlg = 1;
-            double tmpdist = distance(points[idx],points[pointIdx]);
+            double tmpdist = P2Pdistance(points[idx],points[pointIdx]);
             if (tmpdist < points[idx].nearestCorePointDistance){
                     points[idx].clusterID = clusterID;
                     points[idx].nearestCorePointDistance = tmpdist;
@@ -122,12 +122,12 @@ void ExpandCluster(std::vector<Point> &points, int pointIdx, int &clusterID, dou
                 {
                     seeds.push_back(i);
                     points[i].clusterID = clusterID;
-                    points[i].nearestCorePointDistance = distance(points[i],points[currentP]);;
+                    points[i].nearestCorePointDistance = P2Pdistance(points[i],points[currentP]);;
                 }
                 else if (points[i].clusterID == -1 || points[i].isBorderPointFlg)
                 {
                     points[i].isBorderPointFlg = 1;
-                    double tmpdist = distance(points[i],points[currentP]);
+                    double tmpdist = P2Pdistance(points[i],points[currentP]);
                     if (tmpdist < points[i].nearestCorePointDistance){
                         points[i].clusterID = clusterID;
                         points[i].nearestCorePointDistance = tmpdist;
@@ -189,7 +189,7 @@ void DeterminateCorePoints(std::vector<Point> &points, Grid &mygrid, double eps,
                 {
                     for (int tgtptidx : mygrid.GridMapTable[cidx])
                     {
-                        if (distance(points[tgtptidx], points[ptidx]) < eps)
+                        if (P2Pdistance(points[tgtptidx], points[ptidx]) < eps)
                         {
                             cnt++;
                             if (cnt >= minPts)
@@ -222,7 +222,7 @@ void DeterminateNoiseBorderPoint(std::vector<Point> &points, Grid &mygrid, doubl
                 if (points[ptidx].clusterID == -1){
                 for (int cellidx : neighborcells){
                     for (int coreptidx :mygrid.GridMapCoreTable[cellidx]){
-                        double tmpdist = distance(points[ptidx],points[coreptidx]);
+                        double tmpdist = P2Pdistance(points[ptidx],points[coreptidx]);
                         if (tmpdist < eps && tmpdist < points[ptidx].nearestCorePointDistance ){
                             points[ptidx].isBorderPointFlg = 1;
                             points[ptidx].clusterID = points[coreptidx].clusterID;
@@ -246,7 +246,7 @@ bool FindReachPoint(int cellidx, int targetcellidx, std::vector<Point> &points, 
     {
         for (int tgtptidx : mygrid.GridMapCoreTable[targetcellidx])
         {
-            if (distance(points[ptidx], points[tgtptidx]) < eps)
+            if (P2Pdistance(points[ptidx], points[tgtptidx]) < eps)
             {
                 return 1;
             }
